@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { HttpModule } from '@nestjs/axios'; 
+import { TicketSportsController } from './botapi/ticketsports.controller';
+import { TicketSportsService } from './botapi/ticketsports.service';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [HttpModule],
+  controllers: [TicketSportsController],
+  providers: [ TicketSportsService ],
 })
 export class AppModule {}
