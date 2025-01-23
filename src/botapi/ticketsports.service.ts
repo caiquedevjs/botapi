@@ -47,26 +47,48 @@ export class TicketSportsService {
   }
 
   // Método para consultar eventos com JSON no corpo da requisição
-  async getEvents(eventIds: string[], status: string[]): Promise<any> {
-    const body = {
-      events: eventIds, // IDs dos eventos para filtrar
-      status: status,   // Status dos eventos para filtrar, como 'Pago', 'Pendente'
-    };
-
+  async getEvents(body: { events: string[]; status: string[]; token: string; documento: string }): Promise<any[]> {
     const config = {
       headers: {
-        Authorization: `Bearer YOUR_ACCESS_TOKEN`, // Insira o token de acesso aqui
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${body.token}`,
+        'Content-Type': 'application/json', // Adjust content type if needed
       },
+      params: {
+        page: 1,
+        limit: 10,
+      },
+      data: body,
     };
-
+  
     try {
       const response = await firstValueFrom(
-        this.httpService.post(`${this.apiUrl}/Order/List?page=1&limit=10`, body, config), // Mudamos para POST aqui
+        this.httpService.get(`${this.apiUrl}/Order/List`, config)
       );
-
-      return response.data;  // Retorna diretamente os dados da requisição
-    } catch (error) {
+  
+      // Extract and return only the desired participant information
+      if (body.documento) {
+        const participante = response.data.orders.flatMap(pedido => pedido.participante)
+          .find(p => p.documento === body.documento);
+  
+        if (participante) {
+          return [participante]; // Retorna o participante em um array para consistência
+        } else {
+          return []; // Retorna um array vazio se o participante não for encontrado
+        }
+      } else {
+        // Se o documento não foi fornecido, retorna todos os participantes
+        const participantes = response.data.orders.flatMap(pedido => pedido.participante)
+          .map(participante => ({
+            nome: participante.nome,
+            inscricao: participante.inscricao,
+            documento: participante.documento,
+            categoria: participante.categoria,
+            modalidade: participante.modalidade
+          }));
+  
+      return participantes;
+    }}
+     catch (error) {
       if (error.response) {
         console.error('Erro na resposta:', JSON.stringify(error.response.data, null, 2));
         throw new HttpException(
@@ -81,4 +103,6 @@ export class TicketSportsService {
       );
     }
   }
+
+  
 }
