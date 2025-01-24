@@ -1,1 +1,1 @@
-Integração typebot com a api do ticketsports
+Integração com a api do ticketsports
