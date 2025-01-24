@@ -9,7 +9,7 @@ export class TicketSportsService {
   constructor(private readonly httpService: HttpService) {}
 
   // Método para obter o token
-  async getAccessToken(login: string, password: string): Promise<{
+  async getAccessToken(login: string, password: string, accessType: string): Promise<{
     access_token: string;
     expires_in: number;
     refresh_token: string;
@@ -18,7 +18,7 @@ export class TicketSportsService {
     const payload = new URLSearchParams();
     payload.append('Login', login);
     payload.append('Password', password);
-    payload.append('AccessType', 'O');
+    payload.append('AccessType', accessType);
 
     try {
       const response = await firstValueFrom(
