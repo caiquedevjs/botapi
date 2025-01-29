@@ -1,9 +1,14 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { ExpressAdapter } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { AppModule } from './app.module';
+import * as express from 'express';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+const server = express();
+
+async function createApp(expressInstance: express.Express) {
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(expressInstance));
+
   const config = new DocumentBuilder()
     .setTitle('Cats example')
     .setDescription('The cats API description')
@@ -12,6 +17,12 @@ async function bootstrap() {
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
-  await app.listen(3000);
+
+  app.enableCors(); // Habilite CORS, se necessário
+  await app.init();
 }
-bootstrap();
+
+export const handler = async (req: any, res: any) => {
+  await createApp(server);
+  server(req, res);
+};

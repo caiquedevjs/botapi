@@ -38,6 +38,7 @@ export class GetEventsDto {
 
   @ApiProperty({ required: true })
   documento: string;
+
 }
 
 export class QuestionarioDto {

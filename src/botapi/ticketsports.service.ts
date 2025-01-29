@@ -47,7 +47,7 @@ export class TicketSportsService {
   }
 
   // Método para consultar eventos com JSON no corpo da requisição
-  async getEvents(body: { events: string[]; status: string[]; token: string; documento: string }): Promise<any[]> {
+  async getEvents(body: { events: string[]; status: string[]; token: string; documento: string, }): Promise<any[]> {
     const config = {
       headers: {
         Authorization: `Bearer ${body.token}`,
